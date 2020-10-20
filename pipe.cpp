@@ -1,4 +1,8 @@
-  
+/*
+    This program uses pipe as a way for inter-process communication
+    It's between parent and child process.
+    It will prints PING - receive the message and PONG - send the message in a pipe
+*/  
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -61,18 +65,11 @@ int main(){
         
     }
    
-    // if(pid ==0){
-    //     close(ping[0]);
-    //     close(pong[1]);
-    // }
-    // else{
-    //     close(ping[1]);
-    //     close(pong[0]);
-    // }
+
 
      if(pid >0){
       
-       // time_t t;
+       time_t t;
         /* 
             wait for child processes to end 
             https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.1.0/com.ibm.zos.v2r1.bpxbd00/rtwaip.html
@@ -83,10 +80,8 @@ int main(){
             if ((pid = waitpid(pid, &stat, WNOHANG)) == -1)
                perror("wait() error");  /* print a system error message */
             else if (pid == 0) { 
-                // sleep(1);
-                // time(&t);
-                // printf("child is still running at %s", ctime(&t));
-                // sleep(1);
+                time(&t);
+                printf("child is still running at %s", ctime(&t));
             }
             else {
               if (WIFEXITED(stat))

@@ -1,3 +1,9 @@
+/*
+    This program uses pipe as a way for inter-process communication
+    It's between parent and child process.
+    It will prints PING - receive the message and PONG - send the message in a pipe
+    With signal added 
+*/  
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

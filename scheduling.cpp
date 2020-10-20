@@ -1,4 +1,6 @@
-/* https://www.geeksforgeeks.org/multithreading-c-2/ */
+/* 
+    This program creates a FCFS scheduling with threads
+*/
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <unistd.h> 
@@ -6,38 +8,6 @@
 #include <iostream>
 using namespace std;
 
-/*
-pthread_mutex_init, pthread_mutex_lock, pthread_cond_init, pthread_cond_signal and pthread_cond_wait
-
-pthread_mutex_init
-int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr);
-int pthread_mutex_destroy(pthread_mutex_t *mutex);
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-    pthread_mutex_t lock;
-    pthread_mutex_lock(&lock);
-    pthread_mutex_unlock(&lock);
-    pthread_mutex_destroy(&lock);
-
-int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start)(void *), void *arg);
-
-if (pthread_mutex_init(&lock, NULL) != 0)
-{
-    printf("\n mutex init failed\n");
-    return 1;
-}
-
-
-pthread_join(pthread_t, NULL);
-
-pthread_cond_destroy(pthread_cond_t *cond);
-int pthread_cond_init(pthread_cond_t *restrict cond, const pthread_condattr_t *restrict attr);
-pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
-    pthread_cond_t cv;
-    pthread_cond_wait(&cv, &lock);
-    pthread_cond_signal(&cv);
-
-
-*/
 
 #define NUM_THREADS 5
 
