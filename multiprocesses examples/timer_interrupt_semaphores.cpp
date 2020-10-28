@@ -1,8 +1,11 @@
 /* 
     This program has a semaphore value of 3
     It uses counthing semaphore to let the processes enter the shared resource
-    It uses mutex to protect the shared resource, so only one can modify the shared resource at a time
-
+    It uses semaphore and mutex to protect the shared resource, so only one can modify the shared resource at a time
+    
+    This program also implements external interrupt with a timer signal
+    When there's a timer interrupt, the current running process will be pause and move to the back of the queue, and the next 
+    child process will start running.
 */
 
 #include <stdlib.h>         /* exit(), malloc(), free() */
@@ -15,9 +18,12 @@
 #include <sys/wait.h>       
 #include <iostream>
 #include <mutex>
+#include <signal.h>
 #include <queue>
 using namespace std;
+
 #define SEM_NUM 3
+
 struct shared_resource{
     int value;
 };
@@ -25,9 +31,11 @@ struct pcb{
     pid_t pid;
     pcb* next;
 };
-
+sem_t *sem; 
 pcb * head; 
+mutex m_running;
 mutex m;
+mutex m_head;
 
 void Enqueue(pcb* p){
     pcb* curr;
@@ -44,27 +52,36 @@ void Enqueue(pcb* p){
         }
         curr->next = p;
     }
-    cout << "<<<<< PID " << p->pid << " is added to queue" <<endl;
     p->next = NULL;
     
     m.unlock();
 }
 
 pcb* Dequeue(){
+  
+    int sval;
     pcb * front;
     m.lock();
     front = head;
 
     if(front != NULL){
         head = front->next;
-
     }
     m.unlock();
     return front;
 }
-
+void sigalrm_handler(int sig){
+    lock_guard<mutex> locker (m_head);
+    if(head!=NULL){
+        pcb* running = Dequeue();
+        kill(running->pid, SIGSTOP);
+        cout <<" TIMER INTERRUPT !!! pause " << running->pid<<endl;
+        Enqueue(running);
+        kill(head->pid, SIGCONT);
+        alarm(2);
+    }      
+}
 int main ( ){
-    sem_t *sem; 
     head = NULL;
     int shmid;                                  
     pid_t pid;                    
@@ -73,7 +90,6 @@ int main ( ){
     int i;
     time_t t;
     int status;
-
     cout << "===================================================" << endl;
     /*  
         Creating shared memory for int, 
@@ -119,11 +135,9 @@ int main ( ){
     }
     cout << "[Initial semaphore value] is " << sval<< endl;
     glob->value= 1;                                  /* initialize glob */
-   // cout << "[INITIAL VALUE] glob initial value is " <<  glob->value  << endl;
     cout << "How many times do you want to fork? ";
     cin >> fork_n;
   
-    
     /* Forking processes */
     for (i = 0; i < fork_n; i++){
         pid = fork();
@@ -132,13 +146,31 @@ int main ( ){
             exit(1);
         }
         else if (pid == 0)  /* Child process */
-            break;                  
+            break;   
+        else{
+            pcb* process = new pcb {pid, NULL};
+     
+            Enqueue(process);
+        }               
     }
-
+    
     if (pid > 0){ /* Parent Process (pid > 0) */ 
-        while ((pid = wait(&status)) > 0); 
-        cout << "\n[Parent Process: All children have exited]." <<endl;
-
+     
+        signal(SIGALRM, &sigalrm_handler);  // set a signal handler
+        alarm(2);  // set an alarm for 10 seconds from now
+        while (head != NULL){
+            kill(head->pid, SIGCONT);
+            int endID = waitpid(head->pid, &status, WNOHANG|WUNTRACED);
+            if(endID == -1){
+                perror("waitpid error");
+                exit(1);
+            }
+            else if(endID == head->pid){
+                Dequeue();
+            }
+            else
+                sleep(1);
+        }
         /*  shared memory detach 
             http://cgi.di.uoa.gr/~ad/k22/k22-lab-notes4.pdf
         */
@@ -165,30 +197,29 @@ int main ( ){
         exit(0);
       
     }
-    else{   /* Child process */
-    sem_wait(sem);
+    else{   /* Child process */        
+        sem_wait(sem);
+        {
+            lock_guard<mutex> locker (m);
+            cout << "Pid "<< getpid() << " is in the critical section now " << endl;
+            sleep(3);
+            cout << "Pid "<< getpid() << " is running " << endl;
+          
+        }
+         
+        {
+            lock_guard<mutex> locker (m_head);
+            sem_post(sem);
+            if(sem_getvalue(sem, &sval)!=0){
+                cout <<"error in sem_getvalue"<<endl;
+                exit(1);
+            }
 
-    m.lock();
-    if(sem_getvalue(sem, &sval)!=0){
-        cout <<"error in sem_getvalue"<<endl;
-        exit(1);
-    }
-    cout << "[semaphore value] is " << sval<< endl;
-    pcb* process = new pcb {getpid(), NULL};
-     m.unlock();
-    Enqueue(process);
-    sleep(1);    
-    pcb* current = Dequeue();
-    m.lock();
-    cout << ">>>>current running  process PID:" << current->pid <<endl;
-    m.unlock();
-    sem_post(sem);
-    if(sem_getvalue(sem, &sval)!=0){
-        cout <<"error in sem_getvalue"<<endl;
-        exit(1);
-    }
-    cout << "Process is done. New semaphore value is " << sval<< endl<<endl;
-    
-       
+            cout << "Process " << getpid() <<" is done. New semaphore value is " << sval<< endl<<endl;
+            
+            exit(0);
+        }
+        
+
     }
 }
