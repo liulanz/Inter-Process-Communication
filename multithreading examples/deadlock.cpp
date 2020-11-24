@@ -22,8 +22,8 @@ public:
 		// lock_guard<mutex> locker2(m2);
 
 		/* SOLUTION 2 to avoid a deadlock by using adopt lock */
-		lock(m1, m2);
-		lock_guard<mutex> locker1(m1, adopt_lock);
+		lock(m1, m2); /* lock multiple mutex */
+		lock_guard<mutex> locker1(m1, adopt_lock); /* locker1 will adopt the lock of m1 */
 		lock_guard<mutex> locker2(m2, adopt_lock);
 
 		cout << msg << num << endl;
