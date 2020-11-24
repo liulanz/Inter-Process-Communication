@@ -2,7 +2,7 @@
 
 #### multiprocesses
 
-**binarySemaphore.cpp:** This program uses binary semaphore to regulate the access in critical sections. An simple example that shows how binary semaphorece work.
+**binarySemaphore.cpp:** This program uses binary semaphore to regulate the access in critical sections. An simple example that shows how binary semaphore work.
 
 **binarySemaphore_rw.cpp:** This program uses binary semaphore to regulate the access in critical sections. It shows an exmaple of how processes can read at same time and write mutual exclusively
 
