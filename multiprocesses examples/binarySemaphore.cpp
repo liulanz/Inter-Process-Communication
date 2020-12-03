@@ -19,7 +19,7 @@ sem_t *sem;
 pid_t pid;                    
 int *glob;                  
 int fork_n;               
-int sem_num = 2;    /* binary semaphore */
+int sem_num = 1;    /* binary semaphore */
 int read_count = 0;
 sem_t *r_mutex;
 int r_num = 2;
