@@ -10,6 +10,7 @@
 **pipe.cpp:** This program uses pipe as a way for inter-process communication. It's between a parent and a child process. It will prints 'PING' when receiving the message from the pipe and 'PONG' - send the message to a pipe
 
 **timer_interrupt_semaphores.cpp:**  This program has a semaphore value of 3. It uses counting semaphore to let the processes enter the shared resource. It uses semaphore and mutex to protect the shared resource, so only one can modify the shared resource at a time. This program also implements external interrupt with a timer signal. When there's a timer interrupt, the current running process will be pause and move to the back of the queue, and the next child process will start running.
+
 <img src= "images/external_interrupt.jpg" width = "600">
 
 ---
