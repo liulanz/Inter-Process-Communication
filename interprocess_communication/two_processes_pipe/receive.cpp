@@ -16,10 +16,9 @@ int main() {
 		
       cout << "Reading: data is " << x <<endl; 
       count++;
-      if(count %5 ==0){
-        *ready = 0;
-        sleep(1);
-      }
+     
+      sleep(1);
+      
       *ready = 1;
 	}
 
