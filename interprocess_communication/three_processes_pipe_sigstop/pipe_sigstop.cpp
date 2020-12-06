@@ -98,7 +98,7 @@ int main(int argc, char* argv[]){
             }
             /* when read-program sets ready to 0 meaning pause on sending data */
             else if(*ready ==1){ 
-                cout << "resuming" <<endl;
+              //  cout << "resuming" <<endl;
                 kill((pid_t)pids[0], SIGCONT);
             }
            // endID = waitpid(pids[0], &status, WNOHANG|WUNTRACED);
