@@ -1,6 +1,6 @@
 # Inter-Process-Communication
 
-### multiprocesses
+### multiprocesses/
 
 **binarySemaphore.cpp:** This program uses binary semaphore to regulate the access in critical sections. An simple example that shows how binary semaphore work.
 
@@ -15,7 +15,7 @@
 
 ---
 
-### multiprocess
+### multiprocess/
 
 **lock_guard.cpp:** This program uses lock_guard to replace m.lock() and m.unlock() lock will be released once it goes out of scope 
 
@@ -26,7 +26,7 @@
 **scheduling.cpp:** This program shows FCFS schedulings with multiple threads
 
 
-### Execute:
+### RUN
 
 Programs in "multiprocesses examples" can only run on UNIX system
 
@@ -36,12 +36,10 @@ Programs in "multithreading examples"
 
 ```g++ -o filename filename.cpp ```
 	
-### Run
 ``` ./filename```
 
 ---
 
-### [Inter-Process-Communication README](https://github.com/liulanz/Inter-Process-Communication/tree/main/interprocess_communication)
-<img src= "images/pipe_count.jpg" width = "600">
+## [Inter-Process-Communication README](https://github.com/liulanz/Inter-Process-Communication/tree/main/interprocess_communication)
 
----
+
