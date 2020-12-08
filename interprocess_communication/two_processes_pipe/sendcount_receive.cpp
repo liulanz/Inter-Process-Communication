@@ -14,9 +14,6 @@ using namespace std;
 
 #define GRAD_READ pipeML3D[0]
 #define GRAD_WRITE pipeML3D[1]
-#define D3_READ pipe3DML[0]
-#define D3_WRITE pipe3DML[1]
-
 
 
 struct pcb{
@@ -31,7 +28,7 @@ int main(int argc, char* argv[]){
         return -1;
     }
     int* pids;
-    int pipeML3D[2], pipe3DML[2];
+    int pipeML3D[2];
     int *ready;
     int shmid1, shmid2;  
     int i;
@@ -61,47 +58,40 @@ int main(int argc, char* argv[]){
         perror("Pipe creation failure.");
         exit(EXIT_FAILURE);
     }
-    if(pipe(pipe3DML) == -1 ){  
-        perror("Pipe creation failure.");
-        exit(EXIT_FAILURE);
+
+    pid = fork();
+    if (pid < 0) {       /* Error check */    
+        cout << "fork error" << endl;
+        exit(1);
     }
-
-   
-        pid = fork();
-        if (pid < 0) {       /* Error check */    
-            cout << "fork error" << endl;
-            exit(1);
-        }
-        else{
-           receive_pid = pid;
-        }
-                
+    else{
+       receive_pid = pid;
+    }
+            
     
-    if (pid > 0){ /* Parent Process */ 
-        close(D3_READ);
-        close(D3_WRITE);
+    if (pid > 0){ /* Parent Process */
         dup2(GRAD_WRITE , STDOUT_FILENO); /* make output go to pipe */
-
+        close(GRAD_READ);
         int count = 0;
-        while (true) {
+        while (count < 100) {
             if(*ready ==1){
-                
                cout << count <<endl;
                 count++;
                *ready = 0;
-              
             }
         }
-        /* closing the pipe */
-        if(waitpid(receive_pid, &status, WNOHANG|WUNTRACED)!= receive_pid){
-            close(GRAD_WRITE);
-            close(D3_READ);
-            close(D3_WRITE);
-        }
+        close(GRAD_WRITE);
+        close(GRAD_READ);
+     
         /* wait until read finishes reading the rest of the data */
-        while(status = waitpid(receive_pid, &status, WNOHANG|WUNTRACED)!= pids[1] ){
-            if(status==-1)
+        while((status = waitpid(receive_pid, &status, WNOHANG|WUNTRACED))) {
+            if(status == receive_pid )
                 break;
+            else if(status==-1)
+                return -1;
+            else if(status == 0){
+                sleep(1);
+            }
         }
 
         /* deatach shared memory */
@@ -115,21 +105,14 @@ int main(int argc, char* argv[]){
             cout << "Error: Remove shared memory segment  " << endl;
             exit(1);
         }
-      
-        
-        cout << "done"<<endl;
         exit(0);
       
     }
     else{   /* Child process */  
       
-            
-          
-            dup2(GRAD_READ,STDIN_FILENO); /* get input from pipe */
-            close(GRAD_WRITE);
-            close(D3_READ);
-            close(D3_WRITE);
-            execlp(argv[1],argv[1], NULL);
+        dup2(GRAD_READ,STDIN_FILENO); /* get input from pipe */
+        close(GRAD_WRITE);
+        execlp(argv[1],argv[1], NULL);
         
         
    }

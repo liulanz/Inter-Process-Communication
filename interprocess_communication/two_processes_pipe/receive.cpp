@@ -11,18 +11,18 @@ int main() {
 
    string x;
    int count = 0;
-  *ready = 1;
+  	*ready = 1;
 	while(cin >> x){
 		
       cout << "Reading: data is " << x <<endl; 
       count++;
-     
+
       sleep(1);
-      
+     
       *ready = 1;
 	}
+   return 0;
 
 
-   cout <<"finished"<<endl;
-	
+
 }
