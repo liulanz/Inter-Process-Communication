@@ -42,4 +42,7 @@ Programs in "multithreading examples"
 
 ## [Inter-Process-Communication README](https://github.com/liulanz/Inter-Process-Communication/tree/main/interprocess_communication)
 
+## License
+	Copyright [2020] [Liulan Zheng]  - All Rights Reserved
+	Unauthorized copying of this file, via any medium is strictly prohibited
 
